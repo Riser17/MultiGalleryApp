@@ -12,6 +12,9 @@ The Multi-Gallery App is a React Native application that allows users to view mu
 
 ## Previews
 
+https://github.com/Riser17/MultiGalleryApp/assets/91198103/f0bfd277-ac22-49fd-9e80-397aa5d45a1c
+
+<img src="https://github.com/Riser17/MultiGalleryApp/assets/91198103/3cbda0fe-8bdf-4df5-9fe8-bcba9f870b23" width="300" height="500">
 
 ## Installation
 
