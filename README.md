@@ -8,6 +8,7 @@ The Multi-Gallery App is a React Native application that allows users to view mu
 - Supports seamless scrolling and optimized item arrangement.
 - Videos automatically play and loop.
 - Utilizes Expo's AV and Image components for media handling.
+- Masonry layout using the MasonryFlashList component from @shopify/flash-list. 
 
 ## Previews
 
