@@ -1,70 +1,100 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import {
+  StyleSheet,
+  Platform,
+  Text,
+  View,
+  SafeAreaView,
+  Dimensions,
+} from "react-native";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { MasonryFlashList } from "@shopify/flash-list";
+import { ResizeMode, Video } from "expo-av";
+import { Image } from "expo-image";
+import { Layout } from "react-native-reanimated";
+
+const videoUris = [
+  "https://cdn.pixabay.com/video/2023/03/15/154787-808530571_tiny.mp4",
+  "https://cdn.pixabay.com/video/2023/11/19/189692-886572510_tiny.mp4",
+  "https://cdn.pixabay.com/video/2023/01/25/147898-792811387_tiny.mp4",
+  "https://cdn.pixabay.com/video/2022/07/24/125314-733046618_tiny.mp4",
+  "https://cdn.pixabay.com/video/2021/08/13/84878-588566505_tiny.mp4",
+  "https://cdn.pixabay.com/video/2021/08/13/84881-588566509_tiny.mp4",
+  "https://cdn.pixabay.com/video/2022/09/19/131824-751934493_tiny.mp4",
+  "https://cdn.pixabay.com/video/2023/01/25/147899-792811391_tiny.mp4",
+  "https://cdn.pixabay.com/video/2022/10/07/133925-758328055_tiny.mp4",
+  "https://cdn.pixabay.com/video/2022/10/04/133507-756991150_tiny.mp4",
+];
+
+const videoDensity = 7;
+const videoUrisLength = videoUris.length;
+const length = videoUrisLength * videoDensity + Math.floor(videoUrisLength / 2);
+const uris = Array(length)
+  .fill(null)
+  .map((_, i) => {
+    if (i > 0 && i % 7 === 0) return videoUris.splice(-1)[0];
+    return `https://picsum.photos/seed/image${i}/400/400`;
+  });
+
+const videoExtensions = ["mp4"];
+const checkIfVideoByUri = (uri: string) => {
+  if (!uri) return false;
+  const ext = uri.split(".").at(-1);
+  if (!ext) return false;
+  return videoExtensions.includes(ext);
+};
+
+const { width } = Dimensions.get("window");
+const numColumns = 3;
+const itemSize = width / numColumns;
 
 export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <SafeAreaView style={styles.container}>
+      <View style={{ flex: 1, marginRight: 1 }}>
+        <MasonryFlashList
+          data={uris}
+          keyExtractor={(item) => item}
+          getItemType={(item) => (checkIfVideoByUri(item) ? "video" : "image")}
+          estimatedItemSize={itemSize}
+          ItemSeparatorComponent={() => <View style={{ height: 1 }} />}
+          numColumns={numColumns}
+          optimizeItemArrangement
+          overrideItemLayout={(layout, item) => {
+            // const size = width / numColumns
+            const isVideo = checkIfVideoByUri(item);
+            layout.size = isVideo ? itemSize * 2 : itemSize;
+          }}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => {
+            const isVideo = checkIfVideoByUri(item);
+            if (isVideo) {
+              return (
+                <Video
+                  isLooping
+                  shouldPlay
+                  source={{ uri: item }}
+                  resizeMode={ResizeMode.COVER}
+                  style={{ flex: 1, aspectRatio: 1 / 2, marginLeft: 1 }}
+                />
+              );
+            }
+            return (
+              <Image
+                source={item}
+                recyclingKey={item}
+                style={{ flex: 1, aspectRatio: 1, marginLeft: 1 }}
+              />
+            );
+          }}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
   },
 });
